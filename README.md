@@ -4,6 +4,8 @@ Data and `R` code to support Barnard *et al.*, (2022). Modelling the medium-term
 
 The original pre-print submitted in November 2021 and later versions can be found [here](https://www.medrxiv.org/content/10.1101/2021.11.22.21266584)
 
+[![DOI](https://zenodo.org/badge/511480146.svg)](https://zenodo.org/badge/latestdoi/511480146)
+
 ## Study description
 
 England has experienced a heavy burden of COVID-19, with multiple waves of SARS-CoV-2 transmission since early 2020 and high infection levels following the emergence and spread of Omicron variants since late 2021. In response to rising Omicron cases, booster vaccinations were accelerated and offered to all adults in England. Using a model fitted to more than 2 years of epidemiological data, we project potential dynamics of SARS-CoV-2 infections, hospital admissions and deaths in England to December 2022. We consider key uncertainties including future behavioural change and waning immunity and assess the effectiveness of booster vaccinations in mitigating SARS-CoV-2 disease burden between October 2021 and December 2022. If no new variants emerge, SARS-CoV-2 transmission is expected to decline, with low levels remaining in the coming months. The extent to which projected SARS-CoV-2 transmission resurges later in 2022 depends largely on assumptions around waning immunity and to some extent, behaviour, and seasonality.
