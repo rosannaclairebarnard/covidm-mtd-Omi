@@ -1,6 +1,6 @@
 # covidm-mtd-Omi
 
-Data and `R` code to support Barnard *et al.*, (2022). Modelling the medium-term dynamics of SARS-CoV-2 transmission in England in the Omicron era *Nature Communications* (submitted). 
+Data and `R` code to support Barnard *et al.*, Modelling the medium-term dynamics of SARS-CoV-2 transmission in England in the Omicron era, [*Nature Communications*](https://www.nature.com/articles/s41467-022-32404-y) (2022). 
 
 The original pre-print submitted in November 2021 and later versions can be found [here](https://www.medrxiv.org/content/10.1101/2021.11.22.21266584)
 
