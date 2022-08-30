@@ -1,0 +1,13 @@
+.DS_Store
+
+*.o
+
+build/
+
+model_v2/user_defined.cpp
+model_v3/user_defined.cpp
+
+.Rhistory
+.Rapp.history
+.Rproj.user
+
