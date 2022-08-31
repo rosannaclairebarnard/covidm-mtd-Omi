@@ -303,6 +303,116 @@ if(0){
     
 }
 
+if(0){ # August 2022 -- extra plot for Behind the Paper blog
+  greycol = "#c7c2c2"
+  BP_deaths = ggplot(spim_output[d >= "2020-03-01" & d <= max_date & AgeBand == "All" & ValueType == "Deaths" & Geography == "England"]) +
+    geom_ribbon(aes(x = d, ymin = `Quantile 0.05`, ymax = `Quantile 0.95`, fill = "Modelled"), alpha = 0.5) +
+    geom_ribbon(aes(x = d, ymin = `Quantile 0.25`, ymax = `Quantile 0.75`, fill = "Modelled"), alpha = 0.75) +
+    geom_line(aes(x = d, y = Value, colour = "Modelled")) +
+    geom_line(data = data[ValueType == "Deaths" & Geography == "England" & d <= max_date], aes(x = d, y = y, colour = "Data"), size = 0.25) +
+    cowplot::theme_cowplot(font_size = 7, font_family = "sans") +
+    theme(legend.position = 'none', panel.background = element_rect(fill = greycol), 
+          #panel.grid = element_line(colour = "#ffffff", size = 0.5), 
+          axis.text.x = element_blank(),
+          axis.ticks.x = element_blank(),
+          axis.line.x = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks.y = element_blank(),
+          axis.line.y = element_blank()) +
+    labs(x = NULL, y = NULL, fill = NULL, colour = NULL) +
+    scale_colour_manual(values = c(Data = "black", Modelled = cols[1]), aesthetics = c("fill", "colour")) +
+    scale_x_date(date_breaks = date_breaks_opt, date_labels = "%m/%y", expand = c(0.01, 0.01))
+  
+  BP_hosp_adm = ggplot(spim_output[d >= "2020-03-01" & d <= max_date & AgeBand == "All" & ValueType == "Hospital\nadmissions" & Geography == "England"]) +
+    geom_ribbon(aes(x = d, ymin = `Quantile 0.05`, ymax = `Quantile 0.95`, fill = "Modelled"), alpha = 0.5) +
+    geom_ribbon(aes(x = d, ymin = `Quantile 0.25`, ymax = `Quantile 0.75`, fill = "Modelled"), alpha = 0.75) +
+    geom_line(aes(x = d, y = Value, colour = "Modelled")) +
+    geom_line(data = data[ValueType == "Hospital\nadmissions" & Geography == "England" & d <= max_date], aes(x = d, y = y, colour = "Data"), size = 0.2) +
+    cowplot::theme_cowplot(font_size = 7) +
+    theme(legend.position = 'none', panel.background = element_rect(fill = greycol), 
+          #panel.grid = element_line(colour = "#ffffff", size = 0.5),
+          axis.text.x = element_blank(),
+          axis.ticks.x = element_blank(),
+          axis.line.x = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks.y = element_blank(),
+          axis.line.y = element_blank()) +
+    labs(x = NULL, y = NULL, fill = NULL, colour = NULL) +
+    scale_colour_manual(values = c(Data = "black", Modelled = cols[2]), aesthetics = c("fill", "colour")) +
+    scale_x_date(date_breaks = date_breaks_opt, date_labels = "%m/%y", expand = c(0.01, 0.01))
+  
+  BP_hosp_bed = ggplot(spim_output[d >= "2020-03-01" & d <= max_date & AgeBand == "All" & ValueType == "Hospital beds\noccupied" & Geography == "England"]) +
+    geom_ribbon(aes(x = d, ymin = `Quantile 0.05`, ymax = `Quantile 0.95`, fill = "Modelled"), alpha = 0.5) +
+    geom_ribbon(aes(x = d, ymin = `Quantile 0.25`, ymax = `Quantile 0.75`, fill = "Modelled"), alpha = 0.75) +
+    geom_line(aes(x = d, y = Value, colour = "Modelled")) +
+    geom_line(data = data[ValueType == "Hospital beds\noccupied" & Geography == "England" & d <= max_date], aes(x = d, y = y, colour = "Data"), size = 0.2) +
+    cowplot::theme_cowplot(font_size = 7) +
+    theme(legend.position = 'none', panel.background = element_rect(fill = greycol), 
+          #panel.grid = element_line(colour = "#ffffff", size = 0.5),
+          axis.text.x = element_blank(),
+          axis.ticks.x = element_blank(),
+          axis.line.x = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks.y = element_blank(),
+          axis.line.y = element_blank()) +
+    labs(x = NULL, y = NULL, fill = NULL, colour = NULL) +
+    scale_colour_manual(values = c(Data = "black", Modelled = cols[3]), aesthetics = c("fill", "colour")) +
+    scale_x_date(date_breaks = date_breaks_opt, date_labels = "%m/%y", expand = c(0.01, 0.01))
+  
+  BP_icu_bed = ggplot(spim_output[d >= "2020-03-01" & d <= max_date & AgeBand == "All" & ValueType == "ICU beds\noccupied" & Geography == "England"]) +
+    geom_ribbon(aes(x = d, ymin = `Quantile 0.05`, ymax = `Quantile 0.95`, fill = "Modelled"), alpha = 0.5) +
+    geom_ribbon(aes(x = d, ymin = `Quantile 0.25`, ymax = `Quantile 0.75`, fill = "Modelled"), alpha = 0.75) +
+    geom_line(aes(x = d, y = Value, colour = "Modelled")) +
+    geom_line(data = data[ValueType == "ICU beds\noccupied" & Geography == "England" & d <= max_date], aes(x = d, y = y, colour = "Data"), size = 0.2) +
+    cowplot::theme_cowplot(font_size = 7) +
+    theme(legend.position = 'none', panel.background = element_rect(fill = greycol), 
+          #panel.grid = element_line(colour = "#ffffff", size = 0.5),
+          axis.text.x = element_blank(),
+          axis.ticks.x = element_blank(),
+          axis.line.x = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks.y = element_blank(),
+          axis.line.y = element_blank()) +
+    labs(x = NULL, y = NULL, fill = NULL, colour = NULL) +
+    scale_colour_manual(values = c(Data = "black", Modelled = cols[4]), aesthetics = c("fill", "colour")) +
+    scale_x_date(date_breaks = date_breaks_opt, date_labels = "%m/%y", expand = c(0.01, 0.01))
+  
+  BP_pcr = ggplot(spim_output[d >= "2020-03-01" & d <= max_date & AgeBand == "All" & ValueType == "PCR\nprevalence (%)" & Geography == "England"]) +
+    geom_ribbon(aes(x = d, ymin = `Quantile 0.05`, ymax = `Quantile 0.95`, fill = "Modelled"), alpha = 0.5) +
+    geom_ribbon(aes(x = d, ymin = `Quantile 0.25`, ymax = `Quantile 0.75`, fill = "Modelled"), alpha = 0.75) +
+    geom_line(aes(x = d, y = Value, colour = "Modelled")) +
+    geom_ribbon(data = data[ValueType == "PCR\nprevalence (%)" & Geography == "England" & d <= max_date], aes(x = d, ymin = ymin, ymax = ymax, fill = "Data"), alpha = 0.75) +
+    cowplot::theme_cowplot(font_size = 7) +
+    theme(legend.position = 'none', panel.background = element_rect(fill = greycol), 
+          #panel.grid = element_line(colour = "#ffffff", size = 0.5),
+          axis.text.x = element_blank(),
+          axis.ticks.x = element_blank(),
+          axis.line.x = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks.y = element_blank(),
+          axis.line.y = element_blank()) +
+    labs(x = NULL, y = NULL, fill = NULL, colour = NULL) +
+    scale_colour_manual(values = c(Data = "black", Modelled = cols[5]), aesthetics = c("fill", "colour")) +
+    scale_x_date(date_breaks = date_breaks_opt, date_labels = "%m/%y", expand = c(0.01, 0.01))
+  
+  BP_fig_england_fit = cowplot::plot_grid(
+    BP_deaths,
+    NULL,
+    BP_hosp_adm,
+    NULL,
+    BP_hosp_bed,
+    NULL,
+    BP_icu_bed,
+    NULL,
+    BP_pcr,
+    ncol = 1, label_size = 7, align = "v",
+    rel_heights = c(1,-0.1,1,-0.1,1,-0.1,1,-0.1,1))
+  BP_fig_england_fit
+  
+  datetime <- str_replace_all(Sys.time(), "[- :BST]", "")
+  ggsave(paste0("./output/paperfigs/aug22/Behind_the_Paper_cover_", datetime, ".png"), BP_fig_england_fit, width = 180, height = 150, units = "mm")
+}
+
 ###############################################################################
 
 # Figure S1 - model fits to NHS England regions

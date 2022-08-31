@@ -204,6 +204,111 @@ bc_ip
 
 top_panel = cowplot::plot_grid(bc_ha, bc_ip, nrow = 2, align = 'hv')
 top_panel
+
+if(0){ # additional plot for Behind the Paper blogpost; August 2022
+  virusnew = fread("fitting_data/virusprev_nhs_regions_20220825133331.csv")
+  pct = function(x) as.numeric(str_replace_all(x, "%", "")) / 100
+  virusnew[, p := pct(Central.estimate)]
+  # remove any missing values
+  virusnew = virusnew[!(is.na(virusnew$Central.estimate)==TRUE),]
+  virusnew = virusnew[!(is.na(virusnew$Lower.bound)==TRUE),]
+  virusnew = virusnew[!(is.na(virusnew$Upper.bound)==TRUE),]
+  
+  approx_n = function(central, lo95, hi95)
+  {
+    if (length(central) != length(lo95) || length(lo95) != length(hi95)) {
+      stop("central, lo95, and hi95 must all be the same length.")
+    }
+    if (any(c(central, lo95, hi95) < 0) || any(c(central, lo95, hi95) > 1) ||
+        any(lo95 > central) || any(central > hi95) || any(lo95 >= hi95)) {
+      stop("central, lo95 and hi95 must be between 0 and 1 and be correctly ordered.")
+    }
+    dist = function(n_est_log10, central, lo95, hi95)
+    {
+      n_est = 10 ^ n_est_log10;
+      alpha = n_est * central;
+      beta = n_est * (1 - central);
+      w1 = hi95 - lo95;
+      w2 = qbeta(0.975, alpha, beta) - qbeta(0.025, alpha, beta);
+      (w2 - w1) ^ 2
+    }
+    
+    n_est = rep(0, length(central));
+    for (i in seq_along(central))
+    {
+      n_est[i] = 10 ^ optimize(dist, c(0, 9), central = central[i], lo95 = lo95[i], hi95 = hi95[i])$minimum;
+    }
+    n_est
+  }
+  
+  virusnew[, n_approx := approx_n(pct(Central.estimate), pct(Lower.bound), pct(Upper.bound))]
+  virusnew[, pid := match(NHS.region, nhs_regions) - 1]
+  
+  newdata = make_data(ld, sitreps, virusnew, sero_to_fit)
+  newdata = merge(newdata, popsize, by = "Geography")
+  
+  adj_data(newdata, "hospital_inc", 1)
+  adj_data(newdata, "hospital_prev", 1)
+  adj_data(newdata, "icu_prev", 1)
+  adj_data(newdata, "prevalence_mtp", 0.01)
+  adj_data(newdata, "sero_prev", 0.01)
+  adj_data(newdata, "type28_death_inc_line", 1)
+  
+  newdata[ValueType == "hospital_inc", ValueType := "Hospital\nadmissions"]
+  newdata[ValueType == "hospital_prev", ValueType := "Hospital beds\noccupied"]
+  newdata[ValueType == "icu_prev", ValueType := "ICU beds\noccupied"]
+  newdata[ValueType == "infections_inc", ValueType := "Infection\nincidence"]
+  newdata[ValueType == "prevalence_mtp", ValueType := "PCR\nprevalence (%)"]
+  newdata[ValueType == "sero_prev", ValueType := "Sero-\nprevalence (%)"]
+  newdata[ValueType == "type28_death_inc_line", ValueType := "Deaths"]
+  
+  oldv_maxd = as.character(max(virus$Start.date))
+  
+  bp_fig2 = ggplot(spim_output[d >= "2020-03-01" & d <= max_date & AgeBand == "All" & ValueType == "PCR\nprevalence (%)" & Geography == "England"]) +
+    geom_ribbon(aes(x = d, ymin = `Quantile 0.05`, ymax = `Quantile 0.95`, fill = "Modelled"), alpha = 0.5) +
+    geom_ribbon(aes(x = d, ymin = `Quantile 0.25`, ymax = `Quantile 0.75`, fill = "Modelled"), alpha = 0.75) +
+    geom_line(aes(x = d, y = Value, colour = "Modelled")) +
+    geom_ribbon(data = data[ValueType == "PCR\nprevalence (%)" & Geography == "England" & d <= max_date], aes(x = d, ymin = ymin, ymax = ymax, fill = "Data"), alpha = 0.5) +
+    geom_ribbon(data = newdata[ValueType == "PCR\nprevalence (%)" & Geography == "England" & d <= max_date & d > oldv_maxd], aes(x = d, ymin = ymin, ymax = ymax, fill = "New Data")) +
+    cowplot::theme_cowplot(font_size = 12) +
+    theme(panel.background = element_rect(fill = "#f4f4f4"), panel.grid = element_line(colour = "#ffffff", size = 0.5),
+          text = element_text(size = 12, family = "sans")) +
+    labs(x = 'Date', y = "PCR\nprevalence (%)", fill = NULL, colour = NULL, tag = 'b') +
+    scale_colour_manual(values = c(Data = "black", `New Data` = cols[4], Modelled = cols[5]), aesthetics = c("fill", "colour")) +
+    scale_x_date(date_breaks = "6 months", date_labels = "%B %Y", expand = c(0.01, 0.01)) +
+    geom_vline(xintercept = as.Date('2022-05-06'), colour="grey", linetype = "longdash")
+  bp_fig2
+  # datetime <- str_replace_all(Sys.time(), "[- :BST]", "")
+  # ggsave(paste0('./output/paperfigs/aug22/Behind_the_Paper_fig2_', datetime, '.pdf'), bp_fig2, width = 240, height = 80, units = "mm", useDingbats = FALSE)
+  # ggsave(paste0('./output/paperfigs/aug22/Behind_the_Paper_fig2_', datetime, '.png'), bp_fig2, width = 240, height = 80, units = "mm")
+  # 
+  # now do the same for hospital admissions, using UK COVID-19 dashboard data as the new data
+  newhosp = fread('./data/data_2022-Aug-24.csv')
+  oldhosp_maxd = max(sitreps$date)
+  bp_fig2b = ggplot(spim_output[d >= "2020-03-01" & d <= max_date & AgeBand == "All" & ValueType == "Hospital\nadmissions" & Geography == "England"]) +
+    geom_ribbon(aes(x = d, ymin = `Quantile 0.05`, ymax = `Quantile 0.95`, fill = "Modelled"), alpha = 0.5) +
+    geom_ribbon(aes(x = d, ymin = `Quantile 0.25`, ymax = `Quantile 0.75`, fill = "Modelled"), alpha = 0.75) +
+    geom_line(aes(x = d, y = Value, colour = "Modelled")) +
+    geom_line(data = newhosp[date >= oldhosp_maxd], aes(x = date, y = newAdmissions, colour = "New Data")) +
+    geom_line(data = data[ValueType == "Hospital\nadmissions" & Geography == "England" & d <= oldhosp_maxd], aes(x = d, y = y, colour = "Data"), size = 0.2) +
+    cowplot::theme_cowplot(font_size = 12) +
+    theme(panel.background = element_rect(fill = "#f4f4f4"), panel.grid = element_line(colour = "#ffffff", size = 0.5),
+          text = element_text(size = 12, family = "sans")) +
+    labs(x = NULL, y = "Hospital\nadmissions", fill = NULL, colour = NULL, tag = 'a', title = 'Model fit & basecase projection') +
+    scale_colour_manual(values = c(Data = "black", Modelled = cols[2], `New Data` = cols[1]), aesthetics = c("fill", "colour")) +
+    scale_x_date(date_breaks = '6 months', date_labels = "%B %Y", expand = c(0.01, 0.01)) +
+    geom_vline(xintercept = as.Date('2022-05-06'), colour="grey", linetype = "longdash")
+  # datetime <- str_replace_all(Sys.time(), "[- :BST]", "")
+  # ggsave(paste0('./output/paperfigs/aug22/Behind_the_Paper_fig2b_', datetime, '.pdf'), bp_fig2b, width = 240, height = 80, units = "mm", useDingbats = FALSE)
+  # ggsave(paste0('./output/paperfigs/aug22/Behind_the_Paper_fig2b_', datetime, '.png'), bp_fig2b, width = 240, height = 80, units = "mm")
+  # 
+  bpplot = cowplot::plot_grid(bp_fig2b, bp_fig2, nrow = 2, align = 'hv')
+  bpplot
+  datetime <- str_replace_all(Sys.time(), "[- :BST]", "")
+  ggsave(paste0('./output/paperfigs/aug22/Behind_the_Paper_fig2_final_', datetime, '.pdf'), bpplot, width = 240, height = 160, units = "mm", useDingbats = FALSE)
+  ggsave(paste0('./output/paperfigs/aug22/Behind_the_Paper_fig2_final_', datetime, '.png'), bpplot, width = 240, height = 160, units = "mm")
+}
+
 ################################################################################
 
 ################################################################################

@@ -15,15 +15,15 @@ library(ggthemes)
 library(cowplot)
 
 # Specify path to file and filename as well as the publication date of the file
-file = './fitting_data/20220506covid19infectionsurveydatasetsengland.xlsx'
-publicationdate = as.Date('2022-05-06')
+file = './fitting_data/20220819covid19infectionsurveydatasetsengland.xlsx'
+publicationdate = as.Date('2022-08-19')
 
 # We usually find the data required within Excel sheets 1b, 1f and 1q, but this 
 # may change if the format of the published .xlsx file changes, so please check!
 # (Last checked and updated on 1st April 2022)
 sheet_name_1b = "1b"
 sheet_name_1f = "1f"
-sheet_name_1p = '1p'
+sheet_name_1p = '1m'
 s1b = read_excel(file, sheet = sheet_name_1b)
 s1f = read_excel(file, sheet = sheet_name_1f)
 s1p = read_excel(file, sheet = sheet_name_1p)
@@ -189,17 +189,18 @@ colnames(finalts) = colnames(s1p_df)
 # bind new data to old
 s1p_df    = rbind(s1p_df, finalts)
 # s1p_df = finalts
-# # plots to check above data
-# plot(s1p_df$date, s1p_df$...2)
-# plot(s1p_df$date, s1p_df$...5)
-# plot(s1p_df$date, s1p_df$...8)
-# plot(s1p_df$date, s1p_df$...11)
-# plot(s1p_df$date, s1p_df$...14)
-# plot(s1p_df$date, s1p_df$...17)
-# plot(s1p_df$date, s1p_df$...20)
-# plot(s1p_df$date, s1p_df$...23)
-# plot(s1p_df$date, s1p_df$...26)
-# plot(s1p_df$date, s1p_df$...29)
+if(0){ # plots to check above data
+  plot(s1p_df$date, s1p_df$...2)
+  plot(s1p_df$date, s1p_df$...5)
+  plot(s1p_df$date, s1p_df$...8)
+  plot(s1p_df$date, s1p_df$...11)
+  plot(s1p_df$date, s1p_df$...14)
+  plot(s1p_df$date, s1p_df$...17)
+  plot(s1p_df$date, s1p_df$...20)
+  plot(s1p_df$date, s1p_df$...23)
+  plot(s1p_df$date, s1p_df$...26)
+  plot(s1p_df$date, s1p_df$...29)
+}
 
 rm(list=setdiff(ls(), "s1p_df"))
 
